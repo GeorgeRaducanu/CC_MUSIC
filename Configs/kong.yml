@@ -1,0 +1,35 @@
+_format_version: "2.1"
+
+services:
+  - name: auth-service
+    url: http://auth-service:5000
+    routes:
+      - name: auth-route
+        paths:
+          - /auth
+
+  - name: io-service
+    url: http://io-service:5001
+    routes:
+      - name: io-route
+        paths:
+          - /io
+
+  - name: business-logic
+    url: http://business-logic:5002
+    routes:
+      - name: business-route
+        paths:
+          - /business
+
+consumers:
+  - username: admin
+
+# plugins:
+#   - name: key-auth
+#     service: auth-service
+
+# keyauth_credentials:
+#   - consumer: admin
+#     key: super-secret-key
+    # hide_credentials: true

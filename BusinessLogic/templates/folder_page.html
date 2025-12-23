@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+    <a href="/business{{ url_for('add_songs', folder_id=folder_id) }}">Add song</a>
+    {% block body %}
+        <h1>Here is the {{ folder_name.name }} folder content</h1>
+    {% for item in songs %}
+        <div>
+            <a href="/business{{ url_for('get_song', song_id=item.id) }}">
+                {{ item.title }}, {{ item.authors }}
+            </a>
+        </div>
+    {% endfor %}
+    {% endblock %}
+    </body>
+</html>

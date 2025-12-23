@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <h1>Welcome to the BusinessLogic</h1>
+    {% for item in folders %}
+    <div>
+        <a href="/business{{ url_for('folder_page', folder_id=item.id) }}">
+            View folder: {{ item.name }}
+        </a>
+    </div>
+    {% endfor %}
+    <div>
+        <a href="/business{{ url_for('insert_folder') }}">Add folder</a>
+    </div>
+
+    <div>
+        <a href="/business{{ url_for('insert_song_in_db') }}">Add song and author</a>
+    </div>
+    
+</html>

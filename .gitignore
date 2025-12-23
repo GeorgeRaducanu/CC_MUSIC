@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments (at any level)
+**/venv/
+**/env/
+**/ENV/
+**/.venv/
+**/.env/
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Python build artifacts
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# GitLab Runner
+.runner_system_id
+config.toml
+
+# Logs
+*.log
+
+# Docker
+.dockerignore
+
+# Environment variables
+.env
+.env.local

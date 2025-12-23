@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <h1>Add songs to {{ folder_name.name }}</h1>
+    <form method="POST">
+        {% for song in songs %}
+            <div>
+                <input type="checkbox" name="songs" value="{{ song.id }}">
+                <label>{{ song.title }} by {{ song.authors }}</label>
+            </div>
+        {% endfor %}
+        <button type="submit">Add Selected Songs</button>
+    </form>
+    <a href="/business{{ url_for('folder_page', folder_id=folder_id) }}">Back to Folder</a>
+</body>
+</html>

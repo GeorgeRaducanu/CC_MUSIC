@@ -1,4 +1,4 @@
-# filepath: d:\FACULTATE George\Anul 4\Semestrul 2\IDP\idp_music\IOService\Dockerfile
+# filepath: d:\FACULTATE George\Anul 4\Semestrul 2\CC\CC_music\IOService\Dockerfile
 FROM python:3.10
 
 WORKDIR /app

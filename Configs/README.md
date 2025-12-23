@@ -31,5 +31,5 @@ docker swarm init --advertise-addr <IP_INTERFACE>
 
 docker swarm join --token <TOKEN>
 
-docker stack deploy -c docker-stack.yml idp_music
+docker stack deploy -c docker-stack.yml CC_music
 ```

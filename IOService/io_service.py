@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 io_bp = Blueprint('io_service', __name__)
 
 DATABASE_CONFIG = {
-    'dbname': 'idp_music',
+    'dbname': 'CC_music',
     'user': 'admin',  # Use the correct user
     'password': 'admin',  # Use the correct password
     'host': 'postgres-db',

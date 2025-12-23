@@ -1,3 +1,3 @@
 # AuthService
 
-Component responsible for authentification and authorization in the IDP_MUSIC project 
+Component responsible for authentification and authorization in the CC_MUSIC project 

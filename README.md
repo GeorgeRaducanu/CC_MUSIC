@@ -14,69 +14,7 @@ Aplicație de gestionare muzicală bazată pe arhitectură **microservicii**, de
 - **Management cluster** - Portainer pentru Kubernetes
 - **API Gateway** - Kong pentru routing între servicii
 
-## Structura Proiectului
-
-```
-CC_MUSIC/
-├── AuthService/              # Microserviciu autentificare
-│   ├── auth.py
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── templates/
-├── BusinessLogic/            # Microserviciu business logic
-│   ├── business.py
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── templates/
-├── IOService/                # Microserviciu I/O cu DB
-│   ├── io_service.py
-│   ├── Dockerfile
-│   └── requirements.txt
-├── Database/                 # PostgreSQL
-│   ├── Dockerfile
-│   └── schema.sql
-├── Configs/                  # Configurări Docker Compose
-│   ├── docker-compose.yml
-│   ├── kong.yml
-│   └── prometheus.yml
-└── helm/                     # HELM CHART
-    └── cc-music/
-        ├── Chart.yaml        # Metadate chart
-        ├── values.yaml       # Configurări centralizate
-        └── templates/        # Template-uri Kubernetes
-            ├── _helpers.tpl
-            ├── namespace.yaml
-            ├── auth-service-deployment.yaml
-            ├── auth-service-service.yaml
-            ├── io-service-deployment.yaml
-            ├── io-service-service.yaml
-            ├── business-logic-deployment.yaml
-            ├── business-logic-service.yaml
-            ├── postgresql-statefulset.yaml
-            ├── postgresql-service.yaml
-            ├── postgresql-secret.yaml
-            ├── postgresql-configmap.yaml
-            ├── adminer-deployment.yaml
-            ├── adminer-service.yaml
-            ├── portainer-deployment.yaml
-            ├── portainer-service.yaml
-            ├── portainer-pvc.yaml
-            ├── portainer-rbac.yaml
-            ├── prometheus-deployment.yaml
-            ├── prometheus-service.yaml
-            ├── prometheus-configmap.yaml
-            ├── prometheus-pvc.yaml
-            ├── prometheus-rbac.yaml
-            ├── grafana-deployment.yaml
-            ├── grafana-service.yaml
-            ├── grafana-pvc.yaml
-            ├── grafana-datasources.yaml
-            ├── grafana-dashboards-config.yaml
-            ├── grafana-dashboards.yaml
-            └── NOTES.txt
-```
-
-## Prerequisite
+## Software Necesar
 
 1. **Docker Desktop** - pentru construirea imaginilor
 2. **kubectl** - pentru interacțiunea cu Kubernetes
@@ -220,9 +158,6 @@ Pentru Kind, folosește **port-forward** pentru a accesa serviciile local. Fieca
 # ==================== API GATEWAY (RECOMANDAT) ====================
 # Kong Gateway - punct unic de acces pentru toate serviciile
 kubectl port-forward svc/kong 8000:8000 -n cc-music
-# URL: http://localhost:8000/auth   → Auth Service
-# URL: http://localhost:8000/business → Business Logic  
-# URL: http://localhost:8000/io     → IO Service
 
 # ==================== ACCES DIRECT SERVICII ====================
 # Auth Service (direct, fără Kong)

@@ -1,0 +1,65 @@
+# ============================================================================
+# BUSINESS LOGIC - Deployment
+# ============================================================================
+# Microserviciu principal de Business Logic
+# Componenta principală a aplicației pentru funcționalitatea de bază
+# ============================================================================
+
+{{- if .Values.businessLogic.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.businessLogic.name }}
+  namespace: {{ include "cc-music.namespace" . }}
+  labels:
+    app: {{ .Values.businessLogic.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.businessLogic.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.businessLogic.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.businessLogic.name }}
+        {{- include "cc-music.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.businessLogic.name }}
+          image: "{{ .Values.businessLogic.image.repository }}:{{ .Values.businessLogic.image.tag }}"
+          imagePullPolicy: {{ .Values.businessLogic.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.businessLogic.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: FLASK_APP
+              value: "{{ .Values.businessLogic.env.FLASK_APP }}"
+            - name: FLASK_ENV
+              value: "{{ .Values.businessLogic.env.FLASK_ENV }}"
+            # Conexiune la IO Service
+            - name: IO_SERVICE_URL
+              value: "http://{{ .Values.ioService.name }}:{{ .Values.ioService.service.port }}"
+            # Conexiune la Auth Service
+            - name: AUTH_SERVICE_URL
+              value: "http://{{ .Values.authService.name }}:{{ .Values.authService.service.port }}"
+          resources:
+            {{- toYaml .Values.businessLogic.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.businessLogic.service.targetPort }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.businessLogic.service.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+{{- end }}

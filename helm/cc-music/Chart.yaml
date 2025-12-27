@@ -1,0 +1,48 @@
+# ============================================================================
+# CC_MUSIC Helm Chart
+# ============================================================================
+# Acest chart Helm gestionează toate componentele aplicației CC_MUSIC
+# Autori: Arpășanu Emilia-Oana && Răducanu George-Cristian
+# ============================================================================
+
+apiVersion: v2
+name: cc-music
+description: |
+  A cloud-native music application built with microservices architecture.
+  Contains: AuthService, BusinessLogic, IOService, PostgreSQL, Adminer, 
+  Portainer, Prometheus, and Grafana.
+
+type: application
+
+# Versiunea chart-ului Helm (se incrementează la fiecare modificare a chart-ului)
+version: 1.0.0
+
+# Versiunea aplicației (se incrementează la fiecare modificare a codului)
+appVersion: "1.0.0"
+
+# Keywords pentru căutare
+keywords:
+  - music
+  - microservices
+  - flask
+  - postgresql
+  - monitoring
+
+# Maintainers
+maintainers:
+  - name: Arpășanu Emilia-Oana
+  - name: Răducanu George-Cristian
+
+# Home page
+home: https://github.com/your-repo/cc-music
+
+# Sources
+sources:
+  - https://github.com/your-repo/cc-music
+
+# Dependencies (opțional - pentru sub-charts)
+# dependencies:
+#   - name: postgresql
+#     version: "12.x.x"
+#     repository: "https://charts.bitnami.com/bitnami"
+#     condition: postgresql.enabled

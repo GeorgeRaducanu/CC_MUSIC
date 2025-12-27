@@ -1,0 +1,23 @@
+# ============================================================================
+# PROMETHEUS - PersistentVolumeClaim
+# ============================================================================
+
+{{- if and .Values.prometheus.enabled .Values.prometheus.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.prometheus.name }}-pvc
+  namespace: {{ include "cc-music.namespace" . }}
+  labels:
+    app: {{ .Values.prometheus.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.prometheus.persistence.accessMode }}
+  {{- if .Values.prometheus.persistence.storageClass }}
+  storageClassName: {{ .Values.prometheus.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.prometheus.persistence.size }}
+{{- end }}

@@ -1,0 +1,65 @@
+CC_MUSIC - Helm Release instalat
+
+SERVICII DISPONIBILE:
+{{- if .Values.authService.enabled }}
+
+Auth Service:
+  {{- if eq .Values.authService.service.type "NodePort" }}
+  http://<NODE_IP>:{{ .Values.authService.service.nodePort }}
+  {{- else }}
+  Port: {{ .Values.authService.service.port }}
+  {{- end }}
+{{- end }}
+{{- if .Values.ioService.enabled }}
+
+IO Service:
+  {{- if eq .Values.ioService.service.type "NodePort" }}
+  http://<NODE_IP>:{{ .Values.ioService.service.nodePort }}
+  {{- else }}
+  Port: {{ .Values.ioService.service.port }}
+  {{- end }}
+{{- end }}
+{{- if .Values.businessLogic.enabled }}
+
+Business Logic:
+  {{- if eq .Values.businessLogic.service.type "NodePort" }}
+  http://<NODE_IP>:{{ .Values.businessLogic.service.nodePort }}
+  {{- else }}
+  Port: {{ .Values.businessLogic.service.port }}
+  {{- end }}
+{{- end }}
+{{- if .Values.adminer.enabled }}
+
+Adminer (DB Admin):
+  http://<NODE_IP>:{{ .Values.adminer.service.nodePort }}
+  Server: {{ .Values.postgresql.name }}
+  User: {{ .Values.postgresql.auth.username }}
+  Database: {{ .Values.postgresql.auth.database }}
+{{- end }}
+{{- if .Values.portainer.enabled }}
+
+Portainer:
+  http://<NODE_IP>:{{ .Values.portainer.service.nodePort }}
+{{- end }}
+{{- if .Values.prometheus.enabled }}
+
+Prometheus:
+  http://<NODE_IP>:{{ .Values.prometheus.service.nodePort }}
+{{- end }}
+{{- if .Values.grafana.enabled }}
+
+Grafana:
+  http://<NODE_IP>:{{ .Values.grafana.service.nodePort }}
+  User: {{ .Values.grafana.admin.user }}
+  Password: {{ .Values.grafana.admin.password }}
+{{- end }}
+
+COMENZI UTILE:
+
+  kubectl get pods -n {{ include "cc-music.namespace" . }}
+  kubectl get svc -n {{ include "cc-music.namespace" . }}
+  kubectl get nodes -o wide
+
+DEZINSTALARE:
+
+  helm uninstall {{ .Release.Name }} -n {{ include "cc-music.namespace" . }}

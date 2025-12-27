@@ -4,16 +4,18 @@ from flask import Blueprint, request, jsonify
 from flask import Flask, render_template, redirect, url_for, session, flash, current_app
 from prometheus_flask_exporter import PrometheusMetrics
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
 io_bp = Blueprint('io_service', __name__)
 
+# Folosește variabile de environment cu valori default pentru compatibilitate Docker Compose
 DATABASE_CONFIG = {
-    'dbname': 'CC_music',
-    'user': 'admin',  # Use the correct user
-    'password': 'admin',  # Use the correct password
-    'host': 'postgres-db',
-    'port': 5432
+    'dbname': os.getenv('DATABASE_NAME', 'CC_music'),
+    'user': os.getenv('DATABASE_USER', 'admin'),
+    'password': os.getenv('DATABASE_PASSWORD', 'admin'),
+    'host': os.getenv('DATABASE_HOST', 'postgres-db'),
+    'port': int(os.getenv('DATABASE_PORT', 5432))
 }
 
 def getDB():
@@ -359,6 +361,10 @@ def insert_song_and_author():
 app = Flask(__name__)
 app.register_blueprint(io_bp)
 metrics = PrometheusMetrics(app)
+
+@app.route('/health')
+def health():
+    return jsonify({'status': 'healthy'}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

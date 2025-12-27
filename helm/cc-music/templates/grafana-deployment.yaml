@@ -1,0 +1,86 @@
+# ============================================================================
+# GRAFANA - Deployment
+# ============================================================================
+# Dashboard pentru vizualizarea metricilor colectate de Prometheus
+# ============================================================================
+
+{{- if .Values.grafana.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.grafana.name }}
+  namespace: {{ include "cc-music.namespace" . }}
+  labels:
+    app: {{ .Values.grafana.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.grafana.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.grafana.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.grafana.name }}
+        {{- include "cc-music.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 472
+        runAsUser: 472
+      containers:
+        - name: {{ .Values.grafana.name }}
+          image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
+          imagePullPolicy: {{ .Values.grafana.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.grafana.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "{{ .Values.grafana.admin.user }}"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "{{ .Values.grafana.admin.password }}"
+            - name: GF_INSTALL_PLUGINS
+              value: "grafana-clock-panel,grafana-simple-json-datasource"
+          volumeMounts:
+            - name: grafana-data
+              mountPath: /var/lib/grafana
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-dashboards-config
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: grafana-dashboards
+              mountPath: /var/lib/grafana/dashboards
+          resources:
+            {{- toYaml .Values.grafana.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ .Values.grafana.service.targetPort }}
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ .Values.grafana.service.targetPort }}
+            initialDelaySeconds: 30
+            periodSeconds: 5
+      volumes:
+        {{- if .Values.grafana.persistence.enabled }}
+        - name: grafana-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.grafana.name }}-pvc
+        {{- else }}
+        - name: grafana-data
+          emptyDir: {}
+        {{- end }}
+        - name: grafana-datasources
+          configMap:
+            name: {{ .Values.grafana.name }}-datasources
+        - name: grafana-dashboards-config
+          configMap:
+            name: {{ .Values.grafana.name }}-dashboards-config
+        - name: grafana-dashboards
+          configMap:
+            name: {{ .Values.grafana.name }}-dashboards
+{{- end }}

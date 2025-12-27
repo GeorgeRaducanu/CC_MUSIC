@@ -1,0 +1,26 @@
+# ============================================================================
+# POSTGRESQL - Service
+# ============================================================================
+
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.postgresql.name }}
+  namespace: {{ include "cc-music.namespace" . }}
+  labels:
+    app: {{ .Values.postgresql.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.postgresql.service.type }}
+  ports:
+    - port: {{ .Values.postgresql.service.port }}
+      targetPort: {{ .Values.postgresql.service.targetPort }}
+      protocol: TCP
+      name: postgres
+      {{- if eq .Values.postgresql.service.type "NodePort" }}
+      nodePort: {{ .Values.postgresql.service.nodePort }}
+      {{- end }}
+  selector:
+    app: {{ .Values.postgresql.name }}
+{{- end }}

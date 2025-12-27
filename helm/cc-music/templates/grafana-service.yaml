@@ -1,0 +1,26 @@
+# ============================================================================
+# GRAFANA - Service
+# ============================================================================
+
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.grafana.name }}
+  namespace: {{ include "cc-music.namespace" . }}
+  labels:
+    app: {{ .Values.grafana.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.grafana.service.type }}
+  ports:
+    - port: {{ .Values.grafana.service.port }}
+      targetPort: {{ .Values.grafana.service.targetPort }}
+      protocol: TCP
+      name: http
+      {{- if eq .Values.grafana.service.type "NodePort" }}
+      nodePort: {{ .Values.grafana.service.nodePort }}
+      {{- end }}
+  selector:
+    app: {{ .Values.grafana.name }}
+{{- end }}

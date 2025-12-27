@@ -1,0 +1,26 @@
+# ============================================================================
+# GRAFANA - ConfigMap pentru Datasources
+# ============================================================================
+# Configurare automată a sursei de date Prometheus
+# ============================================================================
+
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.grafana.name }}-datasources
+  namespace: {{ include "cc-music.namespace" . }}
+  labels:
+    app: {{ .Values.grafana.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://{{ .Values.prometheus.name }}:{{ .Values.prometheus.service.port }}
+        isDefault: true
+        editable: true
+{{- end }}

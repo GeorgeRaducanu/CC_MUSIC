@@ -7,7 +7,7 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-ENV FLASK_APP=auth.py
+ENV FLASK_APP=business.py
 
 EXPOSE 5002
 

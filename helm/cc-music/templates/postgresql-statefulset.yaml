@@ -1,0 +1,102 @@
+# ============================================================================
+# POSTGRESQL - StatefulSet
+# ============================================================================
+# Bază de date PostgreSQL cu stocare persistentă
+# Folosim StatefulSet pentru a asigura identitate stabilă și stocare persistentă
+# ============================================================================
+
+{{- if .Values.postgresql.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.postgresql.name }}
+  namespace: {{ include "cc-music.namespace" . }}
+  labels:
+    app: {{ .Values.postgresql.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ .Values.postgresql.name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.postgresql.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.postgresql.name }}
+        {{- include "cc-music.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.postgresql.name }}
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          ports:
+            - name: postgres
+              containerPort: {{ .Values.postgresql.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: POSTGRES_DB
+              value: "{{ .Values.postgresql.auth.database }}"
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: "trust"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: postgres-init
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+          # Health check pentru PostgreSQL
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - {{ .Values.postgresql.auth.username }}
+                - -d
+                - {{ .Values.postgresql.auth.database }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - {{ .Values.postgresql.auth.username }}
+                - -d
+                - {{ .Values.postgresql.auth.database }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: postgres-init
+          configMap:
+            name: postgres-init-scripts
+  {{- if .Values.postgresql.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - {{ .Values.postgresql.persistence.accessMode }}
+        {{- if .Values.postgresql.persistence.storageClass }}
+        storageClassName: {{ .Values.postgresql.persistence.storageClass }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.persistence.size }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,59 @@
+# ============================================================================
+# PROMETHEUS - ServiceAccount și RBAC
+# ============================================================================
+# Prometheus necesită permisiuni pentru a descoperi și monitoriza resursele
+# ============================================================================
+
+{{- if .Values.prometheus.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.prometheus.name }}-sa
+  namespace: {{ include "cc-music.namespace" . }}
+  labels:
+    app: {{ .Values.prometheus.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.prometheus.name }}-cr
+  labels:
+    app: {{ .Values.prometheus.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics"]
+    verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.prometheus.name }}-crb
+  labels:
+    app: {{ .Values.prometheus.name }}
+    {{- include "cc-music.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.prometheus.name }}-cr
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.prometheus.name }}-sa
+    namespace: {{ include "cc-music.namespace" . }}
+{{- end }}

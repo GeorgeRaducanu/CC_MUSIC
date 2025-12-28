@@ -8,8 +8,7 @@
 apiVersion: v2
 name: cc-music
 description: |
-  A cloud-native music application built with microservices architecture.
-  Contains: AuthService, BusinessLogic, IOService, PostgreSQL, Adminer, 
+  A cloud-oriented music app that contains: AuthService, BusinessLogic, IOService, PostgreSQL, Adminer, 
   Portainer, Prometheus, and Grafana.
 
 type: application
@@ -33,14 +32,7 @@ maintainers:
   - name: Arpășanu Emilia-Oana
   - name: Răducanu George-Cristian
 
-# Home page
-home: https://github.com/your-repo/cc-music
-
-# Sources
-sources:
-  - https://github.com/your-repo/cc-music
-
-# Dependencies (opțional - pentru sub-charts)
+# Dependencies
 # dependencies:
 #   - name: postgresql
 #     version: "12.x.x"

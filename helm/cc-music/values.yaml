@@ -59,9 +59,9 @@ authService:
   
   # Configurare imagine Docker
   image:
-    repository: auth-service
+    repository: georgeraducanu2002/authservice
     tag: latest
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
   
   # Numărul de replici (instanțe)
   replicaCount: 1
@@ -95,9 +95,9 @@ ioService:
   name: io-service
   
   image:
-    repository: io-service
+    repository: georgeraducanu2002/ioservice
     tag: latest
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
   
   replicaCount: 1
   
@@ -127,9 +127,9 @@ businessLogic:
   name: business-logic
   
   image:
-    repository: business-logic
+    repository: georgeraducanu2002/businesslogic
     tag: latest
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
   
   replicaCount: 1
   

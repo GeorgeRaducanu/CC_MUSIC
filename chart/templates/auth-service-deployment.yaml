@@ -7,7 +7,9 @@ metadata:
     app: auth-service
     {{- include "cc-music.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.authService.autoscaling.enabled }}
   replicas: {{ .Values.authService.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: auth-service

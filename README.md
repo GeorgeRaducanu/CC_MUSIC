@@ -55,19 +55,33 @@ kind load docker-image business-logic:latest --name cc-music-cluster
 kind create cluster --name cc-music --config kind-config.yaml
 ```
 
-## Instalarea Helm:
+## Instalarea cu Helm
 
 ```bash
 helm install cc-music ./chart
 
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+helm repo update
+
+# Descarcă și extrage metrics-server
+helm pull metrics-server/metrics-server --version 3.12.0 --untar --untardir ./chart/charts/
+
+# Descarcă și extrage kube-prometheus-stack
+helm pull prometheus-community/kube-prometheus-stack --version 45.7.1 --untar --untardir ./chart/charts/
+
+# optional - se face automat de catre Helm
 helm install metrics-server metrics-server/metrics-server --set args="{--kubelet-insecure-tls,--kubelet-preferred-address-types=InternalIP}"
 
+# optional - se face automat de catre Helm
 helm install monitoring prometheus-community/kube-prometheus-stack --version 45.7.1
 ```
 
 ## Accesare servicii:
 
-Port forwardinng
+### Port forwardinng (NU mai e necesar)
 
 ```bash
 # Kong Gateway - punct unic de acces pentru toate serviciile

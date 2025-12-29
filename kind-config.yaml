@@ -34,3 +34,11 @@ nodes:
       - containerPort: 30943
         hostPort: 9443
         protocol: TCP
+      # Grafana
+      - containerPort: 30300
+        hostPort: 3000
+        protocol: TCP
+      # Prometheus
+      - containerPort: 30909
+        hostPort: 9090
+        protocol: TCP

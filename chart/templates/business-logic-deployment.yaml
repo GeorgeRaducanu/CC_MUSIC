@@ -7,7 +7,9 @@ metadata:
     app: business-logic
     {{- include "cc-music.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.businessLogic.autoscaling.enabled }}
   replicas: {{ .Values.businessLogic.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: business-logic

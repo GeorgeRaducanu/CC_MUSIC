@@ -11,3 +11,13 @@ appVersion: "1.0.0"
 maintainers:
   - name: Emilia Arpășanu
   - name: George Raducanu
+
+dependencies:
+  - name: metrics-server
+    version: "3.12.0"
+    repository: "https://kubernetes-sigs.github.io/metrics-server/"
+    condition: metrics-server.enabled
+  - name: kube-prometheus-stack
+    version: "45.7.1"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: kube-prometheus-stack.enabled

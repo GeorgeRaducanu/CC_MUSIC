@@ -7,7 +7,9 @@ metadata:
     app: io-service
     {{- include "cc-music.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.ioService.autoscaling.enabled }}
   replicas: {{ .Values.ioService.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: io-service

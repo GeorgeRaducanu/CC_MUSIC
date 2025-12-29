@@ -1,0 +1,31 @@
+{{- if .Values.authService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-auth-service
+  labels:
+    app: auth-service
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.authService.replicas }}
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: {{ .Values.authService.image }}
+          ports:
+            - containerPort: {{ .Values.authService.port }}
+          env:
+            - name: FLASK_APP
+              value: {{ .Values.authService.env.FLASK_APP | quote }}
+            - name: FLASK_ENV
+              value: {{ .Values.authService.env.FLASK_ENV | quote }}
+          resources:
+            {{- toYaml .Values.authService.resources | nindent 12 }}
+{{- end }}

@@ -1,0 +1,49 @@
+{{- if .Values.kong.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-kong
+  labels:
+    app: kong
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.kong.replicas }}
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      labels:
+        app: kong
+    spec:
+      containers:
+        - name: kong
+          image: {{ .Values.kong.image }}
+          ports:
+            - containerPort: {{ .Values.kong.ports.proxy }}
+            - containerPort: 8443
+            - containerPort: {{ .Values.kong.ports.admin }}
+          env:
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_DECLARATIVE_CONFIG
+              value: /usr/local/kong/declarative/kong.yml
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_PROXY_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_LISTEN
+              value: "0.0.0.0:{{ .Values.kong.ports.admin }}, 0.0.0.0:8444 ssl"
+          volumeMounts:
+            - name: kong-config
+              mountPath: /usr/local/kong/declarative/kong.yml
+              subPath: kong.yml
+      volumes:
+        - name: kong-config
+          configMap:
+            name: {{ .Release.Name }}-kong-config
+{{- end }}

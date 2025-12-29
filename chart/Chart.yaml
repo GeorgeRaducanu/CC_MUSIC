@@ -1,0 +1,13 @@
+apiVersion: v2
+name: cc-music
+description: Helm chart for CC Music microservices application
+
+type: application
+
+version: 1.0.0
+
+appVersion: "1.0.0"
+
+maintainers:
+  - name: Emilia Arpășanu
+  - name: George Raducanu

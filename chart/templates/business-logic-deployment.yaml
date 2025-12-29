@@ -1,0 +1,31 @@
+{{- if .Values.businessLogic.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-business-logic
+  labels:
+    app: business-logic
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.businessLogic.replicas }}
+  selector:
+    matchLabels:
+      app: business-logic
+  template:
+    metadata:
+      labels:
+        app: business-logic
+    spec:
+      containers:
+        - name: business-logic
+          image: {{ .Values.businessLogic.image }}
+          ports:
+            - containerPort: {{ .Values.businessLogic.port }}
+          env:
+            - name: FLASK_APP
+              value: {{ .Values.businessLogic.env.FLASK_APP | quote }}
+            - name: FLASK_ENV
+              value: {{ .Values.businessLogic.env.FLASK_ENV | quote }}
+          resources:
+            {{- toYaml .Values.businessLogic.resources | nindent 12 }}
+{{- end }}

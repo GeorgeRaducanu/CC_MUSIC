@@ -1,0 +1,36 @@
+# Kind cluster configuration with port mappings
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      # Kong API Gateway
+      - containerPort: 30800
+        hostPort: 8000
+        protocol: TCP
+      - containerPort: 30801
+        hostPort: 8001
+        protocol: TCP
+      # Auth Service
+      - containerPort: 30500
+        hostPort: 5000
+        protocol: TCP
+      # IO Service
+      - containerPort: 30501
+        hostPort: 5001
+        protocol: TCP
+      # Business Logic
+      - containerPort: 30502
+        hostPort: 5002
+        protocol: TCP
+      # Adminer
+      - containerPort: 30080
+        hostPort: 8080
+        protocol: TCP
+      # Portainer
+      - containerPort: 30900
+        hostPort: 9000
+        protocol: TCP
+      - containerPort: 30943
+        hostPort: 9443
+        protocol: TCP

@@ -16,7 +16,7 @@ Aplicația gestionează colecțiile de melodii a utilizatorilor bazată pe o pe 
 
 ## Elemente necesare de software:
 
-1. **Docker Desktop** -> construirea imaginilor
+1. **Docker Desktop** -> construirea imaginilor (optional)
 2. **kubectl** -> interacțiunea cu Kubernetes
 3. **Helm** (v3.x) -> gestiunea aplicației
 4. **Kind** -> cluster local Kubernetes
@@ -30,10 +30,10 @@ helm version
 kind version
 ```
 
-## Construirea imaginilor Docker:
+## Construirea imaginilor Docker (opțional):
 
 ```bash
-# este necesară mutarea în rădăcina proiectului
+# \mutare în rădăcina proiectului
 cd path/to/CC_MUSIC
 
 docker build -t auth-service:latest ./AuthService
@@ -41,7 +41,7 @@ docker build -t io-service:latest ./IOService
 docker build -t business-logic:latest ./BusinessLogic
 ```
 
-### Încărcarea imaginilor în Kind:
+### Încărcarea imaginilor în Kind (nu mai e necesar - pulicate pe DockerHub):
 
 ```bash
 kind load docker-image auth-service:latest --name cc-music-cluster
@@ -52,27 +52,22 @@ kind load docker-image business-logic:latest --name cc-music-cluster
 ## Crearea și pornirea clusterului Kubernetes:
 
 ```bash
-kind create cluster --name cc-music-cluster
-
-# verificarea detaliilor despre cluster
-kubectl cluster-info --context kind-cc-music-cluster
-
-# configurarea cluster-ului
-kubectl config use-context kind-cc-music-cluster
+kind create cluster --name cc-music --config kind-config.yaml
 ```
 
 ## Instalarea Helm:
 
 ```bash
-cd helm
+helm install cc-music ./chart
 
-# instalează chart-ul (necesar o singură dată)
-helm install cc-music ./cc-music --namespace cc-music --create-namespace
+helm install metrics-server metrics-server/metrics-server --set args="{--kubelet-insecure-tls,--kubelet-preferred-address-types=InternalIP}"
+
+helm install monitoring prometheus-community/kube-prometheus-stack --version 45.7.1
 ```
 
 ## Accesare servicii:
 
-Pentru Kind accesarea pe local a serviciilor se realizează prin **port-forwarding**; fiecare comandă se rulează într-un terminal separat.
+Port forwardinng
 
 ```bash
 # Kong Gateway - punct unic de acces pentru toate serviciile
@@ -105,7 +100,7 @@ kubectl port-forward svc/portainer 9000:9000 -n cc-music
 | Auth Service | 5000 | http://localhost:8000/auth | - |
 | Business Logic | 5002 | http://localhost:8000/business | - |
 | IO Service | 5001 | http://localhost:8000/io | - |
-| **Grafana** | 3000 | http://localhost:3000 | `admin` / `admin` |
+| **Grafana** | 3000 | http://localhost:3000 | `admin` / `prom-operator` |
 | **Prometheus** | 9090 | http://localhost:9090 | - |
 | **Adminer** | 8080 | http://localhost:8080 | `admin` / `admin`; server: `postgres-db`; bază de date: `CC_music` |
 | **Portainer** | 9000 | http://localhost:9000 | se creează la prima accesare |

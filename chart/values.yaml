@@ -1,0 +1,120 @@
+# CC Music Helm Chart Values
+# =========================
+
+# Global settings
+namespace: default
+
+# PostgreSQL Database
+postgresql:
+  enabled: true
+  image: postgres:13
+  replicas: 1
+  credentials:
+    user: admin
+    password: admin
+    database: CC_music
+  storage:
+    size: 1Gi
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Auth Service
+authService:
+  enabled: true
+  image: georgeraducanu2002/authservice:latest
+  replicas: 2
+  port: 5000
+  nodePort: 30500
+  env:
+    FLASK_APP: "auth.py"
+    FLASK_ENV: "production"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Business Logic Service
+businessLogic:
+  enabled: true
+  image: georgeraducanu2002/businesslogic:latest
+  replicas: 2
+  port: 5002
+  nodePort: 30502
+  env:
+    FLASK_APP: "business.py"
+    FLASK_ENV: "production"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# IO Service
+ioService:
+  enabled: true
+  image: georgeraducanu2002/ioservice:latest
+  replicas: 2
+  port: 5001
+  nodePort: 30501
+  env:
+    FLASK_APP: "io_service.py"
+    FLASK_ENV: "production"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Kong API Gateway
+kong:
+  enabled: true
+  image: kong:3.4
+  replicas: 1
+  ports:
+    proxy: 8000
+    admin: 8001
+  nodePorts:
+    proxy: 30800
+    admin: 30801
+
+# Adminer (Database UI)
+adminer:
+  enabled: true
+  image: adminer:latest
+  replicas: 1
+  port: 8080
+  nodePort: 30080
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "100m"
+
+# Portainer
+portainer:
+  enabled: true
+  image: portainer/portainer-ce:2.21.0
+  agentImage: portainer/agent:2.21.0
+  replicas: 1
+  ports:
+    http: 9000
+    https: 9443
+  nodePorts:
+    http: 30900
+    https: 30943
+  storage:
+    size: 1Gi

@@ -1,0 +1,24 @@
+{{- if .Values.portainer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: portainer
+  labels:
+    app: portainer
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  selector:
+    app: portainer
+  ports:
+    - name: http
+      port: {{ .Values.portainer.ports.http }}
+      targetPort: {{ .Values.portainer.ports.http }}
+      nodePort: {{ .Values.portainer.nodePorts.http }}
+      protocol: TCP
+    - name: https
+      port: {{ .Values.portainer.ports.https }}
+      targetPort: {{ .Values.portainer.ports.https }}
+      nodePort: {{ .Values.portainer.nodePorts.https }}
+      protocol: TCP
+{{- end }}

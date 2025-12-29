@@ -1,0 +1,54 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-postgres-init
+  labels:
+    {{- include "cc-music.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      containers:
+        - name: init-db
+          image: {{ .Values.postgresql.image }}
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgres-secret
+                  key: POSTGRES_USER
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgres-secret
+                  key: POSTGRES_DB
+          volumeMounts:
+            - name: schema
+              mountPath: /schema
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Postgres to be ready..."
+              until pg_isready -h postgres-db -U "$PGUSER" -d "$PGDATABASE"; do
+                echo "Postgres not ready, sleeping 2s..."
+                sleep 2
+              done
+              echo "Postgres is ready. Applying schema..."
+              psql -h postgres-db -U "$PGUSER" -d "$PGDATABASE" -f /schema/schema.sql
+      restartPolicy: OnFailure
+      volumes:
+        - name: schema
+          configMap:
+            name: {{ .Release.Name }}-postgres-schema
+{{- end }}

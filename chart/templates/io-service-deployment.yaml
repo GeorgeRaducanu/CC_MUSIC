@@ -1,0 +1,31 @@
+{{- if .Values.ioService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-io-service
+  labels:
+    app: io-service
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.ioService.replicas }}
+  selector:
+    matchLabels:
+      app: io-service
+  template:
+    metadata:
+      labels:
+        app: io-service
+    spec:
+      containers:
+        - name: io-service
+          image: {{ .Values.ioService.image }}
+          ports:
+            - containerPort: {{ .Values.ioService.port }}
+          env:
+            - name: FLASK_APP
+              value: {{ .Values.ioService.env.FLASK_APP | quote }}
+            - name: FLASK_ENV
+              value: {{ .Values.ioService.env.FLASK_ENV | quote }}
+          resources:
+            {{- toYaml .Values.ioService.resources | nindent 12 }}
+{{- end }}

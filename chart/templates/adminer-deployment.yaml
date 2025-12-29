@@ -1,0 +1,26 @@
+{{- if .Values.adminer.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-adminer
+  labels:
+    app: adminer
+    {{- include "cc-music.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.adminer.replicas }}
+  selector:
+    matchLabels:
+      app: adminer
+  template:
+    metadata:
+      labels:
+        app: adminer
+    spec:
+      containers:
+        - name: adminer
+          image: {{ .Values.adminer.image }}
+          ports:
+            - containerPort: {{ .Values.adminer.port }}
+          resources:
+            {{- toYaml .Values.adminer.resources | nindent 12 }}
+{{- end }}

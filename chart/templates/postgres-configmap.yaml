@@ -1,0 +1,133 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-postgres-schema
+  labels:
+    {{- include "cc-music.labels" . | nindent 4 }}
+data:
+  schema.sql: |-
+    CREATE TABLE authors (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL UNIQUE
+    );
+
+    CREATE TABLE folders (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL
+    );
+
+    CREATE TABLE songs (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        source_url TEXT NULL
+    );
+
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        role TEXT NOT NULL CHECK(role IN ('admin', 'user'))
+    );
+
+    CREATE TABLE user_folders (
+        user_id INTEGER NOT NULL,
+        folder_id INTEGER NOT NULL,
+        PRIMARY KEY (user_id, folder_id),
+        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE folder_songs (
+        folder_id INTEGER NOT NULL,
+        song_id INTEGER NOT NULL,
+        PRIMARY KEY (folder_id, song_id),
+        FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE,
+        FOREIGN KEY(song_id) REFERENCES songs(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE song_authors (
+        song_id INTEGER NOT NULL,
+        author_id INTEGER NOT NULL,
+        PRIMARY KEY (song_id, author_id),
+        FOREIGN KEY(song_id) REFERENCES songs(id),
+        FOREIGN KEY(author_id) REFERENCES authors(id)
+    );
+
+    CREATE TABLE song_ratings(
+        song_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 10),
+        PRIMARY KEY (song_id, user_id),
+        FOREIGN KEY(song_id) REFERENCES songs(id) ON DELETE CASCADE,
+        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    -- Default data insertion for testing
+    INSERT INTO "users" ("username", "password", "email", "role") VALUES
+    ('au',	'au',	'au@gmail.com',	'user'),
+    ('of',	'of',	'of@example.com',	'admin');
+
+    INSERT INTO "authors" ("name") VALUES
+    ('ABBA'),
+    ('Beyonce'),
+    ('LadyGaga');
+
+    INSERT INTO "folders" ("name") VALUES
+    ('folder_1'),
+    ('folder_2'),
+    ('Disco party'),
+    ('Disco party 2'),
+    ('Ireland''s top 40'),
+    ('Italy''s top 40'),
+    ('Nicaragua''s top 40'),
+    ('Bulgaria''s top 40'),
+    ('Romania''s top 40'),
+    ('Favourites'),
+    ('Listen Later'),
+    ('Favourites'),
+    ('Listen Later');
+
+    INSERT INTO "songs" ("title", "source_url") VALUES
+    ('Dancing Queen',	'https://youtu.be/xFrGuyw1V8s?si=jQjZkLKTI78WP18N'),
+    ('Mamma Mia',	'https://youtu.be/unfzfe8f9NI?si=LWCi2kUXBCASXaQx');
+
+    INSERT INTO "folder_songs" ("folder_id", "song_id") VALUES
+    (1,	1),
+    (1,	2),
+    (7,	1),
+    (7,	2),
+    (8,	1),
+    (8,	2),
+    (9,	2);
+
+    INSERT INTO "song_authors" ("song_id", "author_id") VALUES
+    (1,	1),
+    (2,	1);
+
+    INSERT INTO "user_folders" ("user_id", "folder_id") VALUES
+    (1,	1),
+    (1,	2),
+    (1,	3),
+    (1,	5),
+    (1,	6),
+    (1,	7),
+    (1,	8),
+    (1,	9),
+    (1, 10),
+    (1, 11),
+    (2,	4),
+    (2,	5),
+    (2,	6),
+    (2,	7),
+    (2,	8),
+    (2,	9),
+    (2, 12),
+    (2, 13);
+
+    INSERT INTO song_ratings (song_id, user_id, rating) VALUES
+    (1, 1, 8),
+    (2, 1, 9),
+    (2, 2, 7);
+{{- end }}

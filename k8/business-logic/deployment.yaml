@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: business-logic
+  labels:
+    app: business-logic
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: business-logic
+  template:
+    metadata:
+      labels:
+        app: business-logic
+    spec:
+      containers:
+        - name: business-logic
+          image: georgeraducanu2002/businesslogic:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: FLASK_APP
+              value: "business.py"
+            - name: FLASK_ENV
+              value: "production"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"

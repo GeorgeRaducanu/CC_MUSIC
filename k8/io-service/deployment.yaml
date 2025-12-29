@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: io-service
+  labels:
+    app: io-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: io-service
+  template:
+    metadata:
+      labels:
+        app: io-service
+    spec:
+      containers:
+        - name: io-service
+          image: georgeraducanu2002/ioservice:latest
+          ports:
+            - containerPort: 5001
+          env:
+            - name: FLASK_APP
+              value: "io_service.py"
+            - name: FLASK_ENV
+              value: "production"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"

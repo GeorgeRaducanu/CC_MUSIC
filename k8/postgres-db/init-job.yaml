@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init-schema
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      containers:
+        - name: init-db
+          image: postgres:13
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+          volumeMounts:
+            - name: schema
+              mountPath: /schema
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Postgres to be ready..."
+              until pg_isready -h postgres-db -U "$PGUSER" -d "$PGDATABASE"; do
+                echo "Postgres not ready, sleeping 2s..."
+                sleep 2
+              done
+              echo "Postgres is ready. Applying schema..."
+              psql -h postgres-db -U "$PGUSER" -d "$PGDATABASE" -f /schema/schema.sql
+      restartPolicy: OnFailure
+      volumes:
+        - name: schema
+          configMap:
+            name: postgres-schema

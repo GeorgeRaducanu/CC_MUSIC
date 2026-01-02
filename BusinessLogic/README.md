@@ -1,3 +1,3 @@
 # BusinessLogic
 
-Component responsible for the buisness logic of our project
+Microserviciu responsabil pentru implementarea logicii interne a aplicației.

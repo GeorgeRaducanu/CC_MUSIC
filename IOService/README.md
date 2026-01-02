@@ -1,3 +1,3 @@
 # IOService
 
-Here is the microservice for the IO operations.
+Microserviciul se ocupă de gestionarea query-urilor SQL care se execută.

@@ -1,3 +1,3 @@
 # AuthService
 
-Component responsible for authentification and authorization in the CC_MUSIC project 
+Microserviciul efectuează autentificarea și autorizarea în cadrul aplicației.

@@ -4,24 +4,24 @@
 
 ## Descriere
 
-Aplicația gestionează colecțiile de melodii a utilizatorilor bazată pe o pe arhitectură cu **microservicii**, deployată în **Kubernetes** folosind **Helm charts**.
+Aplicația gestionează colecțiile de melodii a utilizatorilor bazată pe o pe arhitectură cu microservicii, deployată în Kubernetes folosind Helm charts. Aceasta prezintă funcționalitatea de autoscaling a microserviciilor ce o compun.
 
-### Funcționalități principale:
-- **Autentificare** - Register/Login cu JWT tokens
-- **Gestionare muzică** - Foldere, melodii, autori, rating-uri
-- **Monitorizare** - Prometheus + Grafana dashboards
+### Funcționalitățile principale
+- **Autentificare** - register și login cu JWT tokens
+- **Gestionare muzică** - foldere, melodii, autori, rating-uri
+- **Monitorizare** - Prometheus și Grafana dashboards
 - **Administrare DB** - Adminer pentru PostgreSQL
 - **Management cluster** - Portainer pentru Kubernetes
 - **API Gateway** - Kong pentru routing între servicii
 
-## Elemente necesare de software:
+## Elementele necesare de software
 
-1. **Docker Desktop** -> construirea imaginilor (optional)
+1. **Docker** -> construirea imaginilor (optional)
 2. **kubectl** -> interacțiunea cu Kubernetes
 3. **Helm** (v3.x) -> gestiunea aplicației
 4. **Kind** -> cluster local Kubernetes
 
-### Verificare instalare dependințe necesare:
+### Verificarea instalării dependințelor necesare
 
 ```bash
 docker --version
@@ -30,18 +30,15 @@ helm version
 kind version
 ```
 
-## Construirea imaginilor Docker (opțional):
+## Construirea imaginilor Docker (opțional)
 
 ```bash
-# \mutare în rădăcina proiectului
-cd path/to/CC_MUSIC
-
 docker build -t auth-service:latest ./AuthService
 docker build -t io-service:latest ./IOService
 docker build -t business-logic:latest ./BusinessLogic
 ```
 
-### Încărcarea imaginilor în Kind (nu mai e necesar - pulicate pe DockerHub):
+### Încărcarea imaginilor în Kind (pasul nu mai este necesar; ele sunt pulicate pe DockerHub)
 
 ```bash
 kind load docker-image auth-service:latest --name cc-music-cluster
@@ -49,7 +46,7 @@ kind load docker-image io-service:latest --name cc-music-cluster
 kind load docker-image business-logic:latest --name cc-music-cluster
 ```
 
-## Crearea și pornirea clusterului Kubernetes:
+## Crearea și pornirea clusterului Kubernetes
 
 ```bash
 kind create cluster --name cc-music --config kind-config.yaml
@@ -57,56 +54,34 @@ kind create cluster --name cc-music --config kind-config.yaml
 
 ## Instalarea cu Helm
 
+### Adăugarea în Helm a chart-urilor publice
+
 ```bash
-helm install cc-music ./chart
-
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-
 helm repo update
+```
 
-# Descarcă și extrage metrics-server
+### Instalarea chart-urilor opționale (pasul nu mai este necesar)
+
+```bash
 helm pull metrics-server/metrics-server --version 3.12.0 --untar --untardir ./chart/charts/
-
-# Descarcă și extrage kube-prometheus-stack
 helm pull prometheus-community/kube-prometheus-stack --version 45.7.1 --untar --untardir ./chart/charts/
-
 # optional - se face automat de catre Helm
 helm install metrics-server metrics-server/metrics-server --set args="{--kubelet-insecure-tls,--kubelet-preferred-address-types=InternalIP}"
-
 # optional - se face automat de catre Helm
 helm install monitoring prometheus-community/kube-prometheus-stack --version 45.7.1
 ```
 
-## Accesare servicii:
-
-### Port forwardinng (NU mai e necesar)
+### Deployment-ul proiectului cu Helm
 
 ```bash
-# Kong Gateway - punct unic de acces pentru toate serviciile
-kubectl port-forward svc/kong 8000:8000 -n cc-music
-
-# Auth Service (fără Kong)
-kubectl port-forward svc/auth-service 5000:5000 -n cc-music
-
-# Business Logic (fără Kong)
-kubectl port-forward svc/business-logic 5002:5002 -n cc-music
-
-# Grafana
-kubectl port-forward svc/grafana 3000:3000 -n cc-music
-
-# Prometheus
-kubectl port-forward svc/prometheus 9090:9090 -n cc-music
-
-# Adminer
-kubectl port-forward svc/adminer 8080:8080 -n cc-music
-
-# Portainer
-kubectl port-forward svc/portainer 9000:9000 -n cc-music
+helm install cc-music ./chart
 ```
 
-### Asociere porturi și URL-uri
+## Accesarea serviciilor
+
+### Asocierea porturilor și URL-urilor
 
 | Serviciu | Port | URL | Credențiale |
 |----------|------|-----|-------------|

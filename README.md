@@ -4,12 +4,11 @@
 
 ## Descriere
 
-Aplicația gestionează colecțiile de melodii a utilizatorilor bazată pe o pe arhitectură cu microservicii, deployată în Kubernetes folosind Helm charts. Aceasta prezintă funcționalitatea de autoscaling a microserviciilor ce o compun.
+Aplicația gestionează colecțiile de melodii ale utilizatorilor bazată pe o arhitectură cu microservicii, deployată în Kubernetes folosind manifeste declarative aplicate cu `kubectl`.
 
 ### Funcționalitățile principale
 - **Autentificare** - register și login cu JWT tokens
 - **Gestionare muzică** - foldere, melodii, autori, rating-uri
-- **Monitorizare** - Prometheus și Grafana dashboards
 - **Administrare DB** - Adminer pentru PostgreSQL
 - **Management cluster** - Portainer pentru Kubernetes
 - **API Gateway** - Kong pentru routing între servicii
@@ -18,32 +17,38 @@ Aplicația gestionează colecțiile de melodii a utilizatorilor bazată pe o pe 
 
 1. **Docker** -> construirea imaginilor (optional)
 2. **kubectl** -> interacțiunea cu Kubernetes
-3. **Helm** (v3.x) -> gestiunea aplicației
-4. **Kind** -> cluster local Kubernetes
+3. **Kind** -> cluster local Kubernetes
 
 ### Verificarea instalării dependințelor necesare
 
 ```bash
 docker --version
 kubectl version --client
-helm version
 kind version
+```
+
+## Pornire rapidă (build + launch cu Kind, un singur pas)
+
+Construiește toate imaginile, creează clusterul Kind, încarcă imaginile și aplică toate manifestele dintr-o singură comandă. Se folosește `;` ca separator, care funcționează atât în bash, cât și în PowerShell (`&&` nu este suportat în Windows PowerShell):
+
+```bash
+docker build -t georgeraducanu2002/authservice:latest ./AuthService ; docker build -t georgeraducanu2002/ioservice:latest ./IOService ; docker build -t georgeraducanu2002/businesslogic:latest ./BusinessLogic ; kind create cluster --name cc-music --config kind-config.yaml ; kind load docker-image georgeraducanu2002/authservice:latest georgeraducanu2002/ioservice:latest georgeraducanu2002/businesslogic:latest --name cc-music ; kubectl apply -f k8/postgres-db/ ; kubectl apply -f k8/auth-service/ ; kubectl apply -f k8/io-service/ ; kubectl apply -f k8/business-logic/ ; kubectl apply -f k8/adminer/ ; kubectl apply -f k8/kong/ ; kubectl apply -f k8/portainer/
 ```
 
 ## Construirea imaginilor Docker (opțional)
 
 ```bash
-docker build -t auth-service:latest ./AuthService
-docker build -t io-service:latest ./IOService
-docker build -t business-logic:latest ./BusinessLogic
+docker build -t georgeraducanu2002/authservice:latest ./AuthService
+docker build -t georgeraducanu2002/ioservice:latest ./IOService
+docker build -t georgeraducanu2002/businesslogic:latest ./BusinessLogic
 ```
 
-### Încărcarea imaginilor în Kind (pasul nu mai este necesar; ele sunt pulicate pe DockerHub)
+### Încărcarea imaginilor în Kind (pasul nu mai este necesar; ele sunt publicate pe DockerHub)
 
 ```bash
-kind load docker-image auth-service:latest --name cc-music-cluster
-kind load docker-image io-service:latest --name cc-music-cluster
-kind load docker-image business-logic:latest --name cc-music-cluster
+kind load docker-image georgeraducanu2002/authservice:latest --name cc-music
+kind load docker-image georgeraducanu2002/ioservice:latest --name cc-music
+kind load docker-image georgeraducanu2002/businesslogic:latest --name cc-music
 ```
 
 ## Crearea și pornirea clusterului Kubernetes
@@ -52,31 +57,16 @@ kind load docker-image business-logic:latest --name cc-music-cluster
 kind create cluster --name cc-music --config kind-config.yaml
 ```
 
-## Instalarea cu Helm
-
-### Adăugarea în Helm a chart-urilor publice
+## Deployment-ul proiectului cu kubectl
 
 ```bash
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-```
-
-### Instalarea chart-urilor opționale (pasul nu mai este necesar)
-
-```bash
-helm pull metrics-server/metrics-server --version 3.12.0 --untar --untardir ./chart/charts/
-helm pull prometheus-community/kube-prometheus-stack --version 45.7.1 --untar --untardir ./chart/charts/
-# optional - se face automat de catre Helm
-helm install metrics-server metrics-server/metrics-server --set args="{--kubelet-insecure-tls,--kubelet-preferred-address-types=InternalIP}"
-# optional - se face automat de catre Helm
-helm install monitoring prometheus-community/kube-prometheus-stack --version 45.7.1
-```
-
-### Deployment-ul proiectului cu Helm
-
-```bash
-helm install cc-music ./chart
+kubectl apply -f k8/postgres-db/
+kubectl apply -f k8/auth-service/
+kubectl apply -f k8/io-service/
+kubectl apply -f k8/business-logic/
+kubectl apply -f k8/adminer/
+kubectl apply -f k8/kong/
+kubectl apply -f k8/portainer/
 ```
 
 ## Accesarea serviciilor
@@ -89,7 +79,5 @@ helm install cc-music ./chart
 | Auth Service | 5000 | http://localhost:8000/auth | - |
 | Business Logic | 5002 | http://localhost:8000/business | - |
 | IO Service | 5001 | http://localhost:8000/io | - |
-| **Grafana** | 3000 | http://localhost:3000 | `admin` / `prom-operator` |
-| **Prometheus** | 9090 | http://localhost:9090 | - |
 | **Adminer** | 8080 | http://localhost:8080 | `admin` / `admin`; server: `postgres-db`; bază de date: `CC_music` |
 | **Portainer** | 9000 | http://localhost:9000 | se creează la prima accesare |

@@ -1,1 +1,0 @@
-Instalarea Helm a fost efectuată cu succes. Microserviciile aplicației sunt încărcate.
